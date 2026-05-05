@@ -28,7 +28,11 @@ jobs:
         env:
           NODE_ENV: production
       - name: Build pug-app
-        run: cd pug-app && sed -i 's|../../tsconfig.base.json|../tsconfig.base.json|g' tsconfig.json && pnpm install --no-frozen-lockfile && pnpm run build
+        run: |
+          cd pug-app
+          sed -i 's|../../tsconfig.base.json|../tsconfig.base.json|g' tsconfig.json
+          sed -i 's|../../lib|../lib|g' tsconfig.json
+          pnpm install --no-frozen-lockfile && pnpm run build
         env:
           NODE_ENV: production
           PORT: "3000"
