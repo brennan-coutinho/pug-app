@@ -1,0 +1,274 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: PUG – Personal Viewing Log API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: entries
+    description: Viewing log entries
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /entries:
+    get:
+      operationId: listEntries
+      tags: [entries]
+      summary: List all viewing log entries
+      parameters:
+        - name: mediaType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [movie, tv]
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [watched, want_to_watch, not_watched]
+      responses:
+        "200":
+          description: List of entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Entry"
+    post:
+      operationId: createEntry
+      tags: [entries]
+      summary: Add a new entry to the viewing log
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEntryBody"
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "409":
+          description: Entry already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /entries/{id}:
+    get:
+      operationId: getEntry
+      tags: [entries]
+      summary: Get a single entry by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Entry found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "404":
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateEntry
+      tags: [entries]
+      summary: Update an entry's status or title
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEntryBody"
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "404":
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteEntry
+      tags: [entries]
+      summary: Delete an entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Entry deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "404":
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /entries/stats/summary:
+    get:
+      operationId: getStatsSummary
+      tags: [entries]
+      summary: Get summary counts by media type and status
+      responses:
+        "200":
+          description: Stats summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsSummary"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Entry:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        mediaType:
+          type: string
+          enum: [movie, tv]
+        status:
+          type: string
+          enum: [watched, want_to_watch, not_watched]
+        posterUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - mediaType
+        - status
+        - createdAt
+        - updatedAt
+
+    CreateEntryBody:
+      type: object
+      properties:
+        title:
+          type: string
+        mediaType:
+          type: string
+          enum: [movie, tv]
+        status:
+          type: string
+          enum: [watched, want_to_watch, not_watched]
+        posterUrl:
+          type: string
+          nullable: true
+      required:
+        - title
+        - mediaType
+        - status
+
+    UpdateEntryBody:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: string
+          enum: [watched, want_to_watch, not_watched]
+
+    StatsSummary:
+      type: object
+      properties:
+        totalMovies:
+          type: integer
+        totalTv:
+          type: integer
+        watchedMovies:
+          type: integer
+        watchedTv:
+          type: integer
+        wantToWatchMovies:
+          type: integer
+        wantToWatchTv:
+          type: integer
+        notWatchedMovies:
+          type: integer
+        notWatchedTv:
+          type: integer
+      required:
+        - totalMovies
+        - totalTv
+        - watchedMovies
+        - watchedTv
+        - wantToWatchMovies
+        - wantToWatchTv
+        - notWatchedMovies
+        - notWatchedTv
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

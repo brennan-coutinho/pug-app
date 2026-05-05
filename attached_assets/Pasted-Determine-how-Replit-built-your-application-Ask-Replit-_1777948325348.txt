@@ -1,0 +1,141 @@
+Determine how Replit built your application.
+
+   Ask Replit
+
+
+What tech stack is used to build this application? Is it a monorepo? What Azure service 
+should I use to run this - a static web app or an app service?
+
+ 
+
+   If Replit tells you it is a monorepo running Express for the backend and React for the front-end and that you should run an Azure app service. Then tell Replit: 
+
+
+I plan to use an Azure app service, using code and Node 22. Make any changes necessary 
+so this application can run in that environment. 
+
+ 
+
+   Create a .gitignore file if you don't already have one.
+
+
+Create a .gitignore file for this project. Place it in the root.
+
+ 
+
+   Export the Replit project as a .zip file and copy it to the GitHub repository. Overwrite files as necessary. Commit it locally. Push it to GitHub.
+
+ 
+
+ [PBI] Build an Azure static web app OR an Azure application as needed to run your application.
+
+   Log into Azure. Create the application. If you are using Express and React, then choose Node 22 instead of Python 3.12.
+
+   Connect the Azure service to your GitHub repository.
+
+ 
+
+ [PBI] Edit your Azure app service
+
+   Add Environment variables
+
+ From your Azure Portal app service, on the left menu, click Settings then Environment variables.
+ From the App settings tab, click Add  
+ Name:  DATABASE_URL   Value: postgresql://... connection string to your Supabase database
+NAME:  NODE_ENV     Value: production
+ 
+
+ From your Azure Portal app service, on the left menu, click Settings then Configuration.
+ From the Stack settings tab, enter this Startup command 
+ node artifacts/api-server/dist/index.mjs
+ 
+
+ [PBI] Edit files in your project using VSCode
+
+   Edit artifacts/api-svr/src/app.ts. Around line 40, change 
+
+app.get("*", (_req, res) TO  app.get("/{*path}", (_req, res)
+
+ 
+
+   Edit the YAML file in .github/workflows. Replace the existing build step with the one below. Make the edits noted in highlight. They should match your directory names.
+
+
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # Download your repository's code onto the runner machine.
+      - uses: actions/checkout@v4
+
+      # Install pnpm FIRST, before Node.js setup.
+      # pnpm must exist before setup-node runs — otherwise setup-node
+      # falls back to npm, which this project's preinstall script rejects.
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      # Install Node.js 22. Runs after pnpm so it can use pnpm for caching.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      # Install all third-party libraries across the monorepo.
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # Build the frontend (Vite) and backend (esbuild).
+      # NODE_ENV=production tells build tools to optimize output.
+      # PORT and BASE_PATH are required by the Vite config.
+      - name: Build
+        run: pnpm -r --if-present run build
+        env:
+          NODE_ENV: production
+          PORT: "3000"
+          BASE_PATH: "/"
+
+      # Copy only the compiled output into a clean deploy/ folder.
+      # Azure only needs the built files, not the TypeScript source code.
+      - name: Prepare deployment package
+        run: |
+          mkdir -p deploy/artifacts/api-server
+          mkdir -p deploy/artifacts/reading-buddy
+          cp -r artifacts/api-server/dist deploy/artifacts/api-server/dist
+          cp -r artifacts/reading-buddy/dist deploy/artifacts/reading-buddy/dist
+
+      # Upload the deploy/ folder so the deploy job can access it.
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: deploy/
+   Save all the changes in VSCode.
+
+   Commit.
+
+   Push to GitHub
+
+   Watch GitHub Actions for errors and troubleshoot as necessary.
+
+ 
+
+ [PBI] Test your application on Azure
+
+   Do all of the features work?
+
+ 
+
+ [PBI] Add your custom domain to this Azure service
+
+   Visit your domain. Does your application load?
+
+   Test your application. Do all of your features still work?
+
+ 
