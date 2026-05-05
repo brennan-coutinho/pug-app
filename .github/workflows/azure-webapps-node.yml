@@ -23,8 +23,12 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-      - name: Build
-        run: pnpm -r --if-present run build
+      - name: Build api-server
+        run: pnpm --filter @workspace/api-server run build
+        env:
+          NODE_ENV: production
+      - name: Build pug-app
+        run: pnpm --filter @workspace/pug-app run build
         env:
           NODE_ENV: production
           PORT: "3000"
