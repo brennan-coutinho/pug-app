@@ -32,6 +32,7 @@ jobs:
           cd pug-app
           sed -i 's|../../tsconfig.base.json|../tsconfig.base.json|g' tsconfig.json
           sed -i 's|../../lib|../lib|g' tsconfig.json
+          pnpm add @tailwindcss/typography
           pnpm install --no-frozen-lockfile && pnpm run build
         env:
           NODE_ENV: production
