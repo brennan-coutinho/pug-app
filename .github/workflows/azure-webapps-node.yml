@@ -28,7 +28,7 @@ jobs:
         env:
           NODE_ENV: production
       - name: Build pug-app
-        run: cd pug-app/pug-app && pnpm install --no-frozen-lockfile && pnpm run build
+        run: cd pug-app && pnpm install --no-frozen-lockfile && pnpm run build
         env:
           NODE_ENV: production
           PORT: "3000"
@@ -43,10 +43,10 @@ jobs:
           else
             echo "Warning: api-server/dist not found"
           fi
-          if [ -d "pug-app/pug-app/dist" ]; then
-            cp -r pug-app/pug-app/dist deploy/pug-app/dist
+          if [ -d "pug-app/dist" ]; then
+            cp -r pug-app/dist deploy/pug-app/dist
           else
-            echo "Warning: pug-app/pug-app/dist not found"
+            echo "Warning: pug-app/dist not found"
           fi
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
