@@ -29,6 +29,14 @@ jobs:
           NODE_ENV: production
           PORT: "3000"
           BASE_PATH: "/"
+      - name: Debug - list workspace structure
+        run: |
+          echo "Root contents:"
+          ls -la
+          echo "Artifacts contents:"
+          ls -la artifacts/ || echo "no artifacts dir"
+          echo "pug-app package.json:"
+          cat artifacts/pug-app/package.json || echo "not found"
       - name: Prepare deployment package
         run: |
           mkdir -p deploy/artifacts/api-server
