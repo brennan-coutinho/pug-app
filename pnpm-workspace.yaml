@@ -35,11 +35,11 @@ minimumReleaseAgeExclude:
   - stripe-replit-sync
 
 packages:
-  - artifacts/*
+  - api-server
+  - pug-app/pug-app
   - lib/*
   - lib/integrations/*
   - scripts
-
 catalog:
   '@replit/vite-plugin-cartographer': ^0.5.1
   '@replit/vite-plugin-dev-banner': ^0.1.1
