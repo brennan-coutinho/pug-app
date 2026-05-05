@@ -24,11 +24,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       - name: Build api-server
-        run: cd api-server && node ./build.mjs
+        run: cd api-server && pnpm install --no-frozen-lockfile && node ./build.mjs
         env:
           NODE_ENV: production
       - name: Build pug-app
-        run: cd pug-app/pug-app && pnpm run build
+        run: cd pug-app/pug-app && pnpm install --no-frozen-lockfile && pnpm run build
         env:
           NODE_ENV: production
           PORT: "3000"
