@@ -29,29 +29,20 @@ jobs:
           NODE_ENV: production
           PORT: "3000"
           BASE_PATH: "/"
-      - name: Debug - list workspace structure
-        run: |
-          echo "Root contents:"
-          ls -la
-          echo "Artifacts contents:"
-          ls -la artifacts/ || echo "no artifacts dir"
-          echo "pug-app package.json:"
-          cat artifacts/pug-app/package.json || echo "not found"
       - name: Prepare deployment package
         run: |
-          mkdir -p deploy/artifacts/api-server
-          mkdir -p deploy/artifacts/pug-app
+          mkdir -p deploy/api-server
+          mkdir -p deploy/pug-app
           echo "Checking build outputs..."
-          ls -la artifacts/ || echo "artifacts/ directory not found"
-          if [ -d "artifacts/api-server/dist" ]; then
-            cp -r artifacts/api-server/dist deploy/artifacts/api-server/dist
+          if [ -d "api-server/dist" ]; then
+            cp -r api-server/dist deploy/api-server/dist
           else
-            echo "Warning: artifacts/api-server/dist not found"
+            echo "Warning: api-server/dist not found"
           fi
-          if [ -d "artifacts/pug-app/dist" ]; then
-            cp -r artifacts/pug-app/dist deploy/artifacts/pug-app/dist
+          if [ -d "pug-app/dist" ]; then
+            cp -r pug-app/dist deploy/pug-app/dist
           else
-            echo "Warning: artifacts/pug-app/dist not found"
+            echo "Warning: pug-app/dist not found"
           fi
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
