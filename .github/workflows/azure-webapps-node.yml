@@ -38,6 +38,7 @@ jobs:
           NODE_ENV: production
           PORT: "3000"
           BASE_PATH: "/"
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
       - name: Prepare deployment package
         run: |
           mkdir -p deploy/api-server
